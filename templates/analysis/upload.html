@@ -251,6 +251,65 @@
     }
     .btn-ghost:hover { background: #f8fafc; color: var(--text-base); border-color: #cbd5e1; }
 
+    .btn-danger {
+      background: #dc2626;
+      color: #fff;
+      border-color: #dc2626;
+      box-shadow: 0 1px 3px rgba(220,38,38,.25);
+    }
+    .btn-danger:hover { background: #b91c1c; border-color: #b91c1c; }
+
+    /* ── Modal ── */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15,23,42,.45);
+      backdrop-filter: blur(2px);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      box-shadow: 0 20px 60px rgba(0,0,0,.18), 0 4px 16px rgba(0,0,0,.1);
+      padding: 1.75rem;
+      width: 100%;
+      max-width: 380px;
+      margin: 1rem;
+      animation: modal-in .15s ease;
+    }
+    @keyframes modal-in {
+      from { opacity: 0; transform: scale(.95) translateY(-6px); }
+      to   { opacity: 1; transform: scale(1)  translateY(0);     }
+    }
+    .modal-icon {
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      background: #fee2e2;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 1rem;
+    }
+    .modal-title {
+      font-size: 0.97rem;
+      font-weight: 700;
+      color: var(--text-base);
+      margin-bottom: 0.4rem;
+    }
+    .modal-body {
+      font-size: 0.83rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 1.4rem;
+    }
+    .modal-actions {
+      display: flex;
+      gap: 0.65rem;
+      justify-content: flex-end;
+    }
+
     /* ── Alerts ── */
     .alert {
       display: flex;
@@ -450,10 +509,10 @@
           <svg width="13" height="13" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="2,1 11,6 2,11"/></svg>
           Run Analysis
         </button>
-        <a href="{% url 'clear_results' %}" class="btn btn-ghost">
+        <button type="button" class="btn btn-ghost" onclick="openClearModal()">
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="1" y1="1" x2="11" y2="11"/><line x1="11" y1="1" x2="1" y2="11"/></svg>
           Clear
-        </a>
+        </button>
       </div>
     </form>
   </div>
@@ -523,6 +582,25 @@
 
 </main>
 
+<!-- Clear confirmation modal -->
+<div class="modal-backdrop" id="clearModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modal">
+    <div class="modal-icon">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#dc2626" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="3 6 5 6 17 6"/><path d="M8 6V4h4v2"/><path d="M16 6l-1 11H5L4 6"/>
+      </svg>
+    </div>
+    <div class="modal-title" id="modalTitle">Clear everything?</div>
+    <div class="modal-body">This will remove all uploaded files and analysis results. This action cannot be undone.</div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeClearModal()">Cancel</button>
+      <a href="{% url 'clear_results' %}" class="btn btn-danger">
+        Yes, clear all
+      </a>
+    </div>
+  </div>
+</div>
+
 <script>
   function setupDrop(inputId, nameId, wrapperId, multi) {
     const input   = document.getElementById(inputId);
@@ -555,6 +633,21 @@
     zone.addEventListener('dragover', e => { e.preventDefault(); zone.style.borderColor = 'var(--brand)'; zone.style.background = 'var(--brand-light)'; });
     zone.addEventListener('dragleave', () => { if (!zone.classList.contains('has-file')) { zone.style.borderColor = ''; zone.style.background = ''; } });
     zone.addEventListener('drop',      () => { zone.style.borderColor = ''; zone.style.background = ''; });
+  });
+
+  function openClearModal() {
+    document.getElementById('clearModal').classList.add('open');
+  }
+  function closeClearModal() {
+    document.getElementById('clearModal').classList.remove('open');
+  }
+  // Close on backdrop click
+  document.getElementById('clearModal').addEventListener('click', function (e) {
+    if (e.target === this) closeClearModal();
+  });
+  // Close on Escape
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') closeClearModal();
   });
 </script>
 

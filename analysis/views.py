@@ -65,15 +65,15 @@ def _build_pca_model_map(req_df):
 def _match_project_name(project_name, models_set):
     """
     Returns True if project_name matches any model in models_set.
-    Supports both exact match and prefix match — MODEL values are often
-    shortforms made from the first N characters of the project name
-    (e.g. OTTER → Otter Lake-S, Otter Lake-2).
+    Checks both directions because the relationship can go either way:
+      - Model is a prefix of the project name: "OTTER" → "Otter Lake-S"
+      - Project name is a prefix of the model:  "Gardena" ← "GARDENAE"
     """
     pn = (project_name or "").lower().strip()
     if not pn:
         return False
     for m in models_set:
-        if pn == m or pn.startswith(m):
+        if pn == m or pn.startswith(m) or m.startswith(pn):
             return True
     return False
 
