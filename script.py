@@ -1,0 +1,10 @@
+import os
+os.chdir('/home/ubuntu/Whereused_mapper')
+os.system("git reset --hard")
+os.system("git pull")
+os.system ('sudo chown :www-data ~/Whereused_mapper/')
+os.system('sudo chmod 777 -R  ~/Whereused_mapper/')
+os.system ('sudo systemctl restart apache2')
+os.system ('cat /etc/apache2/envvars')
+os.system ('sudo systemctl restart redis-server')
+os.system ('celery -A InESS worker --loglevel=info --detach')
