@@ -25,8 +25,7 @@ SECRET_KEY = 'django-insecure-(0c9$brol_cj)#wutta&!cl#vz7h_wx0v=@imkt*l_9@s&y#&r
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ["whereusedmapper.inesssolutions.net","127.0.0.1","localhost"]
 
 # Application definition
 
