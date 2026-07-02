@@ -69,7 +69,7 @@ def _match_project_name(project_name, models_set):
       - Model is a prefix of the project name: "OTTER" → "Otter Lake-S"
       - Project name is a prefix of the model:  "Gardena" ← "GARDENAE"
     """
-    pn = (project_name or "").lower().strip()
+    pn = str(project_name).lower().strip() if pd.notna(project_name) else ""
     if not pn:
         return False
     for m in models_set:
