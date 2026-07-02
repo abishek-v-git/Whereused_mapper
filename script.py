@@ -9,4 +9,3 @@ result = subprocess.run(
 
 print(result.stdout)
 print(result.stderr)
-bro replace your current script
