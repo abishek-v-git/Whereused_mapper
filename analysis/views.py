@@ -119,8 +119,6 @@ def _process_flat_files(flat_files, pca_to_models):
     pca_files = [f for f in flat_files if not f.name.rsplit(".", 1)[0].strip().upper().startswith("ASY")]
     asy_files = [f for f in flat_files if f.name.rsplit(".", 1)[0].strip().upper().startswith("ASY")]
 
-    parent_item_projects = {}  # {PARENT_ITEM_UPPER: cleaned_project_name}
-
     for wu_file in pca_files:
         stem = wu_file.name.rsplit(".", 1)[0].strip().upper()
 
@@ -138,26 +136,12 @@ def _process_flat_files(flat_files, pca_to_models):
                 f"Flat file '{wu_file.name}' is missing columns: {', '.join(sorted(missing))}"
             )
 
-        production = df[df["Lifecycle Phase"] == WHEREUSED_FILTER_PHASE]
-        for _, row in production.iterrows():
-            parent_item = str(row.get("Parent Item") or "").strip().upper()
-            project_name = row.get("Project Name F")
-            if parent_item and pd.notna(project_name):
-                cleaned = _QUALIFIER_RE.sub("", str(project_name).strip()).strip().lower()
-                if cleaned:
-                    parent_item_projects[parent_item] = cleaned
-
         filtered = _filter_flat_df(df, models_for_pca)
         results.append(_flat_result(wu_file, filtered))
 
+    all_models = set().union(*pca_to_models.values()) if pca_to_models else set()
+
     for wu_file in asy_files:
-        stem = wu_file.name.rsplit(".", 1)[0].strip().upper()
-
-        if stem not in parent_item_projects:
-            skipped.append(f"{wu_file.name} (parent item not found in a Production row of the uploaded PCA files)")
-            continue
-
-        models_for_pca = {parent_item_projects[stem]}
         df = _read_whereused_flat(wu_file)
 
         required = {"Parent Item", "Lifecycle Phase", "Project Name F", "Product Line(s) F"}
@@ -167,7 +151,7 @@ def _process_flat_files(flat_files, pca_to_models):
                 f"Flat file '{wu_file.name}' is missing columns: {', '.join(sorted(missing))}"
             )
 
-        filtered = _filter_flat_df(df, models_for_pca)
+        filtered = _filter_flat_df(df, all_models)
         results.append(_flat_result(wu_file, filtered))
 
     return results, skipped
